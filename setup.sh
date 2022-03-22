@@ -31,8 +31,12 @@ az extension remove --name aks-preview
 
 az group create -l $location -n $resourceGroupName -o table
 
-acrid=$(az acr create -l $location -g $resourceGroupName -n $acrName --sku Basic --query id -o tsv)
-echo $acrid
+acr_json=$(az acr create -l $location -g $resourceGroupName -n $acrName --sku Basic -o json)
+echo $acr_json
+acr_loginServer=$(echo $acr_json | jq -r .loginServer)
+acr_id=$(echo $acr_json | jq -r .id)
+echo $acr_loginServer
+echo $acr_id
 
 #######################
 #     _    ____ ____
@@ -42,6 +46,32 @@ echo $acrid
 # /_/   \_\____|_| \_\
 # demos
 #######################
+
+az acr build --registry $acrName --image "simpleapp" ./src/simpleapp
+
+# Size of "win-helloworld:
+az acr manifest metadata list --help
+sizeInBytes1=$(az acr manifest metadata list -n "simpleapp" -r $acrName --query '[].{Size: imageSize, Tags: tags}' | jq ".[0].Size")
+echo $sizeInBytes1
+numfmt --to iec --format "%8.4f" $sizeInBytes1
+
+# From: https://github.com/Azure/acr/issues/169
+$repositories = (az acr repository list -n $acrName -o tsv)
+$repositories
+
+az acr repository list -n $acrName -o json
+foreach ($repo in $repositories) {
+  "Repository: $repo"
+  az acr repository show-manifests -n $acrName --repository $repo --detail --query '[].{Name: name, Size: imageSize, Tags: tags[0],Created: createdTime, Architecture: architecture, OS: os}' -o table
+}
+
+##############################
+#     __     _    ____ ____
+#    / /    / \  / ___|  _ \
+#   / /    / _ \| |   | |_) |
+#  / /    / ___ \ |___|  _ <
+# /_/    /_/   \_\____|_| \_\
+##############################
 
 aadAdmingGroup=$(az ad group list --display-name $aadAdminGroupContains --query [].objectId -o tsv)
 echo $aadAdmingGroup

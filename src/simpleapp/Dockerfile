@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azure-cli:2.31.0
+FROM alpine:3.14.4
 
 COPY init.sh /bin/
 RUN chmod 755 /bin/init.sh
