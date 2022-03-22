@@ -10,6 +10,10 @@
 *.userosscache
 *.sln.docstates
 
+*.pem
+*.pfx
+tls-secret.*
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -348,3 +352,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+*-secret.yaml
+*.json
+*.bin
+perf-test/
