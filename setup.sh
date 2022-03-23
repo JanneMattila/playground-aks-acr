@@ -98,7 +98,6 @@ echo $accessToken
 ./acr login $acr_loginServer -u "00000000-0000-0000-0000-000000000000" -p "$accessToken"
 
 show_image_tags "apps/simpleapp"
-./acr purge -r $acrName --filter ".*:.*" --ago 1m --keep 1 --dry-run
 ./acr purge -r $acrName --filter "apps/simpleapp:.*" --ago 1m --keep 1 --dry-run
 ./acr purge -r $acrName --filter "apps/simpleapp:.*" --ago 1d
 
