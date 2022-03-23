@@ -52,21 +52,61 @@ show_image_size () {
   numfmt --to iec --format "%8.4f" $size_in_bytes
 }
 
-az acr build --registry $acrName --image "simpleapp" ./src/simpleapp
-show_image_size "simpleapp"
+show_image_tags () {
+  local tags=$(az acr repository show-tags --repository "$1" -n $acrName -o tsv)
+  for tag in $tags
+  do
+    echo "$repo:$tag"
+  done
+}
 
-# From: https://github.com/Azure/acr/issues/169
+az acr build --registry $acrName --image "apps/simpleapp:$(date +%s)" ./src/simpleapp
+az acr build --registry $acrName --image "apps/simpleapp:{{.Run.ID}}" ./src/simpleapp
+show_image_size "apps/simpleapp"
+show_image_tags "apps/simpleapp"
+
+# Look usage for all the images
 repositories=$(az acr repository list -n $acrName -o tsv)
 echo $repositories
 
 for repo in $repositories
 do
-  echo   "Repository: $repo"
+  echo "Repository: $repo"
   show_image_size $repo
 done
 
 # Import images
 az acr import -n $acrName -t "base/alpine:3.15.1" --source "docker.io/library/alpine:3.15.1" 
+
+# Ad-hoc purge
+# See more examples: https://github.com/Azure/acr-cli#purge-command
+for repo in $repositories
+do
+  show_image_tags $repo
+done
+
+# Download ACR CLI from GitHub Releases
+download=$(curl -sL https://api.github.com/repos/Azure/acr-cli/releases/36955810 | jq -r '.assets[].browser_download_url' | grep Linux_x86_64)
+wget $download -O acr.zip
+tar -xf acr.zip 
+file acr.zip
+mv acr-cli acr
+./acr --help
+
+accessToken=$(az acr login -n $acrName --expose-token --query accessToken -o tsv)
+echo $accessToken
+./acr login $acr_loginServer -u "00000000-0000-0000-0000-000000000000" -p "$accessToken"
+
+show_image_tags "apps/simpleapp"
+./acr purge -r $acrName --filter ".*:.*" --ago 1m --keep 1 --dry-run
+./acr purge -r $acrName --filter "apps/simpleapp:.*" --ago 1m --keep 1 --dry-run
+./acr purge -r $acrName --filter "apps/simpleapp:.*" --ago 1d
+
+# Use ACR run command
+purge_command="acr purge --registry $acrName --filter 'apps/simpleapp:.*' --ago 10m --keep 1"
+purge_command="acr purge --registry $acrName --filter 'apps/simpleapp:.*' --ago 10m --keep 1 --dry-run"
+echo $purge_command
+az acr run --cmd "$purge_command" --registry $acrName /dev/null
 
 ##############################
 #     __     _    ____ ____

@@ -357,3 +357,5 @@ MigrationBackup/
 *.json
 *.bin
 perf-test/
+acr
+acr.zip
