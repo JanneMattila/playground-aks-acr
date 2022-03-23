@@ -47,23 +47,26 @@ echo $acr_id
 # demos
 #######################
 
-az acr build --registry $acrName --image "simpleapp" ./src/simpleapp
+show_image_size () {
+  local size_in_bytes=$(az acr manifest metadata list -n "$1" -r $acrName --query '[].{Size: imageSize, Tags: tags}' | jq ".[0].Size")
+  numfmt --to iec --format "%8.4f" $size_in_bytes
+}
 
-# Size of "win-helloworld:
-az acr manifest metadata list --help
-sizeInBytes1=$(az acr manifest metadata list -n "simpleapp" -r $acrName --query '[].{Size: imageSize, Tags: tags}' | jq ".[0].Size")
-echo $sizeInBytes1
-numfmt --to iec --format "%8.4f" $sizeInBytes1
+az acr build --registry $acrName --image "simpleapp" ./src/simpleapp
+show_image_size "simpleapp"
 
 # From: https://github.com/Azure/acr/issues/169
-$repositories = (az acr repository list -n $acrName -o tsv)
-$repositories
+repositories=$(az acr repository list -n $acrName -o tsv)
+echo $repositories
 
-az acr repository list -n $acrName -o json
-foreach ($repo in $repositories) {
-  "Repository: $repo"
-  az acr repository show-manifests -n $acrName --repository $repo --detail --query '[].{Name: name, Size: imageSize, Tags: tags[0],Created: createdTime, Architecture: architecture, OS: os}' -o table
-}
+for repo in $repositories
+do
+  echo   "Repository: $repo"
+  show_image_size $repo
+done
+
+# Import images
+az acr import -n $acrName -t "base/alpine:3.15.1" --source "docker.io/library/alpine:3.15.1" 
 
 ##############################
 #     __     _    ____ ____
