@@ -24,6 +24,8 @@ accessToken=$(az acr login -n $acrName --expose-token --query accessToken -o tsv
 ./acr purge -r $acrName --filter "apps/simpleapp:.*" --ago 1d
 ```
 
+See more examples in [ACR CLI](https://github.com/Azure/acr-cli#purge-command) repository.
+
 ## Links
 
 [Push and pull Helm charts to an Azure container registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-helm-repos)
