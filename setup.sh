@@ -78,6 +78,21 @@ done
 # Import images
 az acr import -n $acrName -t "base/alpine:3.15.1" --source "docker.io/library/alpine:3.15.1" 
 
+############################
+# Import vulnerable images
+# --
+# More images:
+# https://hub.docker.com/u/vulnerables
+############################
+az acr import -n $acrName -t "bad/dotnet/core/sdk:2.2.401" --source "mcr.microsoft.com/dotnet/core/sdk:2.2.401" 
+az acr import -n $acrName -t "bad/vulnerables/web-dvwa" --source "docker.io/vulnerables/web-dvwa" 
+az acr import -n $acrName -t "bad/vulnerables/metasploit-vulnerability-emulator" --source "docker.io/vulnerables/metasploit-vulnerability-emulator" 
+az acr import -n $acrName -t "bad/vulnerables/cve-2017-7494" --source "docker.io/vulnerables/cve-2017-7494" 
+az acr import -n $acrName -t "bad/vulnerables/mail-haraka-2.8.9-rce" --source "docker.io/vulnerables/mail-haraka-2.8.9-rce" 
+############################
+# /Import vulnerable images
+############################
+
 # Ad-hoc purge
 # See more examples: https://github.com/Azure/acr-cli#purge-command
 for repo in $repositories
