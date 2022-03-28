@@ -11,6 +11,7 @@ vnetName="myakacr-vnet"
 subnetAks="AksSubnet"
 subnetAcr="AcrSubnet"
 identityName="myaksacr"
+identityName2="myaksacr2"
 resourceGroupName="rg-myaksacr"
 location="westeurope"
 
@@ -148,6 +149,19 @@ echo $subnetaksid
 
 identityid=$(az identity create --name $identityName --resource-group $resourceGroupName --query id -o tsv)
 echo $identityid
+
+# This is another Managed Identity
+identityid2=$(az identity create --name $identityName2 --resource-group $resourceGroupName --query id -o tsv)
+identityappid2=$(az identity show --name $identityName2 --resource-group $resourceGroupName --query principalId -o tsv)
+echo $identityid2
+echo $identityappid2
+
+# Grant permissions to pull images from ACR:
+az role assignment create \
+  --role "AcrPull" \
+  --assignee-object-id $identityappid2 \
+  --assignee-principal-type ServicePrincipal \
+  --scope $acr_id
 
 az aks get-versions -l $location -o table
 
