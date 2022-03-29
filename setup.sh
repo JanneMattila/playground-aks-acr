@@ -131,6 +131,44 @@ az acr run --cmd "$purge_command" --registry $acrName /dev/null
 # /_/    /_/   \_\____|_| \_\
 ##############################
 
+#########################
+#   ____ ___ ____ ____
+#  / ___|_ _/ ___|  _ \
+# | |    | | |   | | | |
+# | |___ | | |___| |_| |
+#  \____|___\____|____/
+# CI/CD vulnerability scanning
+#########################
+
+# https://github.com/JanneMattila/github-actions-demos/blob/main/.github/workflows/defender.yml
+# Example output:
+# https://github.com/JanneMattila/github-actions-demos/runs/5738915725?check_suite_focus=true
+
+# Scanning for vulnerabilties in image: vulnerables/cve-2017-7494
+# ╔══════════════════════╤═════════════════╤═════════════════╤════════════════════════════════════════════════════╤══════════════════════╗
+# ║ VULNERABILITY ID     │ PACKAGE NAME    │ SEVERITY        │ DESCRIPTION                                        │ TARGET               ║
+# ╟──────────────────────┼─────────────────┼─────────────────┼────────────────────────────────────────────────────┼──────────────────────╢
+# ║ CVE-2019-3462        │ apt             │ HIGH            │ Incorrect sanitation of the 302 redirect field in  │ vulnerables/cve-     ║
+# ║                      │                 │                 │ HTTP transport method of apt versions 1.4.8 and    │ 2017-7494 (debian    ║
+# ║                      │                 │                 │ earlier can lead to content injection by a MITM    │ 8.9)                 ║
+# ║                      │                 │                 │ attacker, potentially leading to remote code       │                      ║
+# ║                      │                 │                 │ execution on the target machine.                   │                      ║
+# ╟──────────────────────┼─────────────────┼─────────────────┼────────────────────────────────────────────────────┼──────────────────────╢
+# ║ CVE-2019-9924        │ bash            │ HIGH            │ rbash in Bash before 4.4-beta2 did not prevent the │ vulnerables/cve-     ║
+# ║                      │                 │                 │ shell user from modifying BASH_CMDS, thus allowing │ 2017-7494 (debian    ║
+# ║                      │                 │                 │ the user to execute any command with the           │ 8.9)                 ║
+# ║                      │                 │                 │ permissions of the shell.                          │                      ║
+# ╟──────────────────────┼─────────────────┼─────────────────┼────────────────────────────────────────────────────┼──────────────────────╢
+# ...
+
+#################################
+#     __   ____ ___ ____ ____
+#    / /  / ___|_ _/ ___|  _ \
+#   / /  | |    | | |   | | | |
+#  / /   | |___ | | |___| |_| |
+# /_/     \____|___\____|____/
+################################
+
 aadAdmingGroup=$(az ad group list --display-name $aadAdminGroupContains --query [].objectId -o tsv)
 echo $aadAdmingGroup
 

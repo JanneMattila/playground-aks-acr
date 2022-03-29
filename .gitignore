@@ -359,3 +359,4 @@ MigrationBackup/
 perf-test/
 acr
 acr.zip
+**/container-scan/
