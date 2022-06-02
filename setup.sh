@@ -11,6 +11,7 @@ vnetName="myakacr-vnet"
 subnetAks="AksSubnet"
 subnetAcr="AcrSubnet"
 identityName="myaksacr"
+kubeletidentityName="myakskubeletacr"
 identityName2="myaksacr2"
 resourceGroupName="rg-myaksacr"
 location="westeurope"
@@ -169,7 +170,7 @@ az acr run --cmd "$purge_command" --registry $acrName /dev/null
 # /_/     \____|___\____|____/
 ################################
 
-aadAdmingGroup=$(az ad group list --display-name $aadAdminGroupContains --query [].objectId -o tsv)
+aadAdmingGroup=$(az ad group list --display-name $aadAdminGroupContains --query [].id -o tsv)
 echo $aadAdmingGroup
 
 workspaceid=$(az monitor log-analytics workspace create -g $resourceGroupName -n $workspaceName --query id -o tsv)
@@ -187,6 +188,9 @@ echo $subnetaksid
 
 identityid=$(az identity create --name $identityName --resource-group $resourceGroupName --query id -o tsv)
 echo $identityid
+
+kubeletidentityid=$(az identity create --name $kubeletidentityName --resource-group $resourceGroupName --query id -o tsv)
+echo $kubeletidentityid
 
 # This is another Managed Identity
 identityid2=$(az identity create --name $identityName2 --resource-group $resourceGroupName --query id -o tsv)
@@ -212,7 +216,7 @@ az aks create -g $resourceGroupName -n $aksName \
  --node-count 1 --enable-cluster-autoscaler --min-count 1 --max-count 2 \
  --node-osdisk-type Ephemeral \
  --node-vm-size Standard_D32ds_v4 \
- --kubernetes-version 1.22.6 \
+ --kubernetes-version 1.23.5 \
  --enable-addons monitoring,azure-policy,azure-keyvault-secrets-provider \
  --enable-aad \
  --enable-managed-identity \
@@ -222,6 +226,7 @@ az aks create -g $resourceGroupName -n $aksName \
  --load-balancer-sku standard \
  --vnet-subnet-id $subnetaksid \
  --assign-identity $identityid \
+ --assign-kubelet-identity $kubeletidentityid \
  --api-server-authorized-ip-ranges $myip \
  -o table 
 
