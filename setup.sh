@@ -1,4 +1,5 @@
-#!/bin/bash
+# Enable auto export
+set -a
 
 # All the variables for the deployment
 subscriptionName="AzureDev"
@@ -48,6 +49,7 @@ echo $acr_id
 # /_/   \_\____|_| \_\
 # demos
 #######################
+#region ACR demos
 
 show_image_size () {
   local size_in_bytes=$(az acr manifest metadata list -n "$1" -r $acrName --query '[].{Size: imageSize, Tags: tags}' | jq ".[0].Size")
@@ -124,6 +126,7 @@ purge_command="acr purge --registry $acrName --filter 'apps/simpleapp:.*' --ago 
 echo $purge_command
 az acr run --cmd "$purge_command" --registry $acrName /dev/null
 
+#endregion
 ##############################
 #     __     _    ____ ____
 #    / /    / \  / ___|  _ \
@@ -132,6 +135,28 @@ az acr run --cmd "$purge_command" --registry $acrName /dev/null
 # /_/    /_/   \_\____|_| \_\
 ##############################
 
+##################################
+#  _                   _
+# | |     ___    __ _ (_) _ __
+# | |    / _ \  / _` || || '_ \
+# | |___| (_) || (_| || || | | |
+# |_____|\___/  \__, ||_||_| |_|
+#               |___/
+# examples
+##################################
+#region Login
+
+# Build simpleapp locally
+docker build src/simpleapp/ -t localsimpleapp:latest
+
+accessToken=$(az acr login -n $acrName --expose-token --query accessToken -o tsv)
+docker login $acr_loginServer -u "00000000-0000-0000-0000-000000000000" -p "$accessToken"
+
+# Push locally build image to ACR
+docker tag localsimpleapp:latest "$acr_loginServer/localapps/simpleapp:latest"
+docker push "$acr_loginServer/localapps/simpleapp:latest"
+
+#endregion
 #########################
 #   ____ ___ ____ ____
 #  / ___|_ _/ ___|  _ \
