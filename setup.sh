@@ -149,6 +149,14 @@ az acr run --cmd "$purge_command" --registry $acrName /dev/null
 # Build simpleapp locally
 docker build src/simpleapp/ -t localsimpleapp:latest
 
+# Make sure, we don't have docker login session to our ACR
+docker logout $acr_loginServer
+docker logout azure
+
+# Option 1: Automatic login
+az acr login -n $acrName
+
+# Option 2: Manual login
 accessToken=$(az acr login -n $acrName --expose-token --query accessToken -o tsv)
 docker login $acr_loginServer -u "00000000-0000-0000-0000-000000000000" -p "$accessToken"
 
