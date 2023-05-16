@@ -2,8 +2,8 @@
 set -a
 
 # All the variables for the deployment
-subscriptionName="AzureDev"
-aadAdminGroupContains="janne''s"
+subscriptionName="development"
+aadAdminGroupContains="janneops"
 
 aksName="myaksacr"
 acrName="myaksacr0000010"
@@ -159,6 +159,15 @@ az acr login -n $acrName
 # Option 2: Manual login
 accessToken=$(az acr login -n $acrName --expose-token --query accessToken -o tsv)
 docker login $acr_loginServer -u "00000000-0000-0000-0000-000000000000" -p "$accessToken"
+
+# Option 3: Create scope map and token
+az acr scope-map create --name developers --registry $acrName \
+  --repository localapps/simpleapp \
+  content/write content/read \
+  --description "Developer access to localapps/simpleapp repository"
+developerTokenJson=$(az acr token create --name developertoken1 --registry $acrName --scope-map developers -o json)
+developerTokenPassword=$(echo $developerTokenJson | jq -r '.credentials.passwords[0].value')
+echo $developerTokenPassword | docker login --username developertoken1 --password-stdin $acr_loginServer
 
 # Push locally build image to ACR
 docker tag localsimpleapp:latest "$acr_loginServer/localapps/simpleapp:latest"
