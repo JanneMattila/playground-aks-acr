@@ -34,4 +34,8 @@ See more examples in [ACR CLI](https://github.com/Azure/acr-cli#purge-command) r
 
 [Automate container image builds and maintenance with ACR Tasks](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-tasks-overview)
 
-[Automatically purge images from an Azure container registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auto-purge)
+[Automatically purge images from an Azure container registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-auto-purge)
+
+[Set a retention policy for untagged manifests](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-retention-policy)
+
+[Tutorial: Run an ACR task on a defined schedule](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-tasks-scheduled)
